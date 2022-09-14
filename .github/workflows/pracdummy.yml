@@ -11,6 +11,51 @@ on:
   workflow_dispatch:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Run test
+        run: npm test
+
+  hello:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: hello world
+        run: echo "Hello world"
+        shell: bash
+
+  goodbye:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: goodbye
+        run: echo "Goodbye World"
+        shell: bash
+
+  prod-check:
+    needs: [build]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying to production server on branch $GITHUB_REF"
+
   dump_contexts_to_log:
     runs-on: ubuntu-latest
     steps:
@@ -27,47 +72,3 @@ jobs:
         run: echo '${{ toJSON(strategy) }}'
       - name: Dump matrix context
         run: echo '${{ toJSON(matrix) }}'
-    # build:
-    #   runs-on: ubuntu-latest
-    #   strategy:
-    #     matrix:
-    #       node-version: [16.x]
-    #     fail-fast: true
-
-    #   steps:
-    #     - uses: actions/checkout@v3
-    #     - name: Use Node.js ${{ matrix.node-version }}
-    #       uses: actions/setup-node@v3
-    #       with:
-    #         node-version: ${{ matrix.node-version }}
-
-    #     - name: Install dependencies
-    #       run: |
-    #         npm install
-
-    #     - name: Run test
-    #       run: npm test
-
-    # hello:
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - uses: actions/checkout@v3
-    #     - name: hello world
-    #       run: echo "Hello world"
-    #       shell: bash
-
-    # goodbye:
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - name: goodbye
-    #       run: echo "Goodbye World"
-    #       shell: bash
-
-    # prod-check:
-    #   needs: [build]
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - run: echo "Deploying to production server on branch $GITHUB_REF"
