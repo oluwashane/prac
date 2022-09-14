@@ -10,11 +10,3 @@ jobs:
           node-version: "14"
       - run: npm install -g bats
       - run: bats -v
-  connect-postgre:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Connect to PostgreSQL
-        run: node client.js
-        env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
